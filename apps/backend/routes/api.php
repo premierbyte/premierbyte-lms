@@ -1,5 +1,6 @@
 <?php
 
+use App\Modules\Categories\Controllers\CategoryController;
 use App\Modules\Licensing\Controllers\LicensingController;
 use App\Modules\Organizations\Controllers\OrganizationController;
 use App\Modules\Users\Controllers\AuthController;
@@ -23,6 +24,14 @@ Route::prefix('v1')->group(function () {
         Route::get('/users/{id}', [UserController::class, 'show'])->can('users.view');
         Route::put('/users/{id}', [UserController::class, 'update']);
         Route::delete('/users/{id}', [UserController::class, 'destroy']);
+
+        // Category Management Endpoints
+        Route::get('/categories', [CategoryController::class, 'index'])->can('categories.view');
+        Route::post('/categories', [CategoryController::class, 'store'])->can('categories.create');
+        Route::post('/categories/reorder', [CategoryController::class, 'reorder']);
+        Route::get('/categories/{id}', [CategoryController::class, 'show'])->can('categories.view');
+        Route::put('/categories/{id}', [CategoryController::class, 'update']);
+        Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
 
         // Feature Gated Organization Management
         Route::middleware('feature:organizations')->group(function () {
