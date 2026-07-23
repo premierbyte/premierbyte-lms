@@ -2,6 +2,7 @@
 
 namespace App\Modules\Licensing\Providers;
 
+use App\Modules\Licensing\Console\Commands\SyncLicenseCommand;
 use App\Modules\Licensing\Contracts\LicensingServiceInterface;
 use App\Modules\Licensing\Services\LicensingService;
 use Illuminate\Support\Facades\Gate;
@@ -26,7 +27,7 @@ class LicensingServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
-                \App\Modules\Licensing\Console\Commands\SyncLicenseCommand::class,
+                SyncLicenseCommand::class,
             ]);
         }
 
