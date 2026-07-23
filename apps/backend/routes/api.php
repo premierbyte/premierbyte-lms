@@ -3,6 +3,7 @@
 use App\Modules\Licensing\Controllers\LicensingController;
 use App\Modules\Organizations\Controllers\OrganizationController;
 use App\Modules\Users\Controllers\AuthController;
+use App\Modules\Users\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -14,6 +15,14 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/auth/me', [AuthController::class, 'me']);
         Route::post('/licensing/activate', [LicensingController::class, 'activate']);
+
+        // User Management Endpoints
+        Route::get('/users', [UserController::class, 'index'])->can('users.view');
+        Route::post('/users', [UserController::class, 'store'])->can('users.create');
+        Route::post('/users/invite', [UserController::class, 'invite']);
+        Route::get('/users/{id}', [UserController::class, 'show'])->can('users.view');
+        Route::put('/users/{id}', [UserController::class, 'update']);
+        Route::delete('/users/{id}', [UserController::class, 'destroy']);
 
         // Feature Gated Organization Management
         Route::middleware('feature:organizations')->group(function () {

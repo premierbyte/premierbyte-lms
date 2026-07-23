@@ -143,7 +143,7 @@ Deliverables
 
 Status
 
-- ☐ Pending
+- [x] Completed
 
 ---
 
