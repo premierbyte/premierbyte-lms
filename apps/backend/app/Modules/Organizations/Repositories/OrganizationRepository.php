@@ -2,11 +2,17 @@
 
 namespace App\Modules\Organizations\Repositories;
 
+use App\Core\BaseRepository;
 use App\Modules\Organizations\DTOs\OrganizationDTO;
 use App\Modules\Organizations\Models\Organization;
 
-class OrganizationRepository implements OrganizationRepositoryInterface
+/**
+ * @extends BaseRepository<Organization>
+ */
+class OrganizationRepository extends BaseRepository implements OrganizationRepositoryInterface
 {
+    protected string $modelClass = Organization::class;
+
     /**
      * Get primary organization or create default one.
      */
@@ -16,7 +22,8 @@ class OrganizationRepository implements OrganizationRepositoryInterface
         $organization = Organization::first();
 
         if ($organization === null) {
-            $organization = Organization::create([
+            /** @var Organization $organization */
+            $organization = $this->create([
                 'name' => 'Premierbyte LMS',
                 'slug' => 'premierbyte-lms',
                 'email' => 'admin@premierbyte.com',
@@ -39,11 +46,10 @@ class OrganizationRepository implements OrganizationRepositoryInterface
     /**
      * Update organization by ID.
      */
-    public function update(int $id, OrganizationDTO $dto): Organization
+    public function updateDTO(int $id, OrganizationDTO $dto): Organization
     {
         /** @var Organization $organization */
-        $organization = Organization::findOrFail($id);
-        $organization->update($dto->toArray());
+        $organization = $this->update($id, $dto->toArray());
 
         return $organization;
     }

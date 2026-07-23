@@ -53,28 +53,36 @@ Every module MUST follow the exact structure below.
 
 ```
 app/
+├── Core/
+│   ├── Contracts/        (ResponseInterface)
+│   ├── Traits/           (ApiResponse)
+│   ├── BaseAction.php
+│   ├── BaseController.php
+│   ├── BaseDTO.php
+│   ├── BaseRepository.php
+│   └── BaseService.php
 └── Modules/
     └── Customers/
-        ├── Actions/
-        ├── Controllers/
+        ├── Actions/       (Extends BaseAction)
+        ├── Controllers/   (Extends BaseController)
         ├── Database/
         │   ├── Factories/
         │   ├── Migrations/
         │   └── Seeders/
-        ├── DTOs/
+        ├── DTOs/          (Extends BaseDTO)
         ├── Events/
         ├── Jobs/
         ├── Listeners/
         ├── Models/
         ├── Policies/
-        ├── Repositories/
+        ├── Repositories/  (Extends BaseRepository)
         ├── Requests/
         ├── Resources/
-        ├── Routes/
-        ├── Services/
+        ├── routes/
+        │   └── api.php    (Auto-discovered by ModuleServiceProvider)
+        ├── Services/      (Extends BaseService)
         ├── Tests/
-        ├── README.md
-        └── module.json
+        └── README.md
 ```
 
 Every module must follow the same structure.

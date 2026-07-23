@@ -2,12 +2,12 @@
 
 namespace App\Modules\Licensing\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Core\BaseController;
 use App\Modules\Licensing\Contracts\LicensingServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class LicensingController extends Controller
+class LicensingController extends BaseController
 {
     public function __construct(
         protected LicensingServiceInterface $licensingService
@@ -20,10 +20,7 @@ class LicensingController extends Controller
     {
         $status = $this->licensingService->getStatus();
 
-        return response()->json([
-            'success' => true,
-            'data' => $status->toArray(),
-        ]);
+        return $this->successResponse($status->toArray(), 'License status retrieved successfully');
     }
 
     /**
@@ -33,13 +30,10 @@ class LicensingController extends Controller
     {
         $status = $this->licensingService->getStatus();
 
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'in_restricted_mode' => $status->inRestrictedMode,
-                'features' => $status->features,
-            ],
-        ]);
+        return $this->successResponse([
+            'in_restricted_mode' => $status->inRestrictedMode,
+            'features' => $status->features,
+        ], 'Feature flags retrieved successfully');
     }
 
     /**
@@ -58,9 +52,6 @@ class LicensingController extends Controller
             $request->ip()
         );
 
-        return response()->json([
-            'success' => true,
-            'data' => $result,
-        ]);
+        return $this->successResponse($result, 'License activated successfully');
     }
 }

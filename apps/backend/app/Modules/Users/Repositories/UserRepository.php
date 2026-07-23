@@ -2,20 +2,26 @@
 
 namespace App\Modules\Users\Repositories;
 
+use App\Core\BaseRepository;
 use App\Models\User;
 use App\Modules\Users\DTOs\CreateUserDTO;
 use App\Modules\Users\DTOs\UpdateUserDTO;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Hash;
 
-class UserRepository implements UserRepositoryInterface
+/**
+ * @extends BaseRepository<User>
+ */
+class UserRepository extends BaseRepository implements UserRepositoryInterface
 {
+    protected string $modelClass = User::class;
+
     /**
      * Paginate users with optional search and role filtering.
      *
      * @return LengthAwarePaginator<int, User>
      */
-    public function paginate(int $perPage = 15, ?string $search = null, ?string $role = null): LengthAwarePaginator
+    public function paginateFiltered(int $perPage = 15, ?string $search = null, ?string $role = null): LengthAwarePaginator
     {
         $query = User::query()->with('roles');
 
@@ -32,7 +38,10 @@ class UserRepository implements UserRepositoryInterface
             $query->role($role);
         }
 
-        return $query->latest()->paginate($perPage);
+        /** @var LengthAwarePaginator<int, User> $result */
+        $result = $query->latest()->paginate($perPage);
+
+        return $result;
     }
 
     /**
@@ -40,15 +49,19 @@ class UserRepository implements UserRepositoryInterface
      */
     public function findById(int $id): User
     {
-        return User::with(['roles', 'permissions'])->findOrFail($id);
+        /** @var User $user */
+        $user = User::with(['roles', 'permissions'])->findOrFail($id);
+
+        return $user;
     }
 
     /**
-     * Create user.
+     * Create user from DTO.
      */
-    public function create(CreateUserDTO $dto): User
+    public function createUser(CreateUserDTO $dto): User
     {
-        $user = User::create([
+        /** @var User $user */
+        $user = $this->create([
             'first_name' => $dto->firstName,
             'last_name' => $dto->lastName,
             'username' => $dto->username,
@@ -68,9 +81,9 @@ class UserRepository implements UserRepositoryInterface
     }
 
     /**
-     * Update user by ID.
+     * Update user by ID from DTO.
      */
-    public function update(int $id, UpdateUserDTO $dto): User
+    public function updateUser(int $id, UpdateUserDTO $dto): User
     {
         $user = $this->findById($id);
 
@@ -101,10 +114,8 @@ class UserRepository implements UserRepositoryInterface
     /**
      * Delete user by ID.
      */
-    public function delete(int $id): bool
+    public function deleteUser(int $id): bool
     {
-        $user = $this->findById($id);
-
-        return (bool) $user->delete();
+        return $this->delete($id);
     }
 }

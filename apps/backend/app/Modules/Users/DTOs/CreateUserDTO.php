@@ -2,7 +2,9 @@
 
 namespace App\Modules\Users\DTOs;
 
-class CreateUserDTO
+use App\Core\BaseDTO;
+
+class CreateUserDTO extends BaseDTO
 {
     /**
      * @param  array<int, string>  $roles
@@ -37,5 +39,24 @@ class CreateUserDTO
             status: (string) ($data['status'] ?? 'active'),
             roles: isset($data['roles']) && is_array($data['roles']) ? array_values(array_map('strval', $data['roles'])) : ['Student']
         );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toArray(): array
+    {
+        return [
+            'first_name' => $this->firstName,
+            'last_name' => $this->lastName,
+            'username' => $this->username,
+            'email' => $this->email,
+            'password' => $this->password,
+            'phone' => $this->phone,
+            'avatar' => $this->avatar,
+            'bio' => $this->bio,
+            'status' => $this->status,
+            'roles' => $this->roles,
+        ];
     }
 }

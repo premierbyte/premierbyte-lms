@@ -225,7 +225,7 @@ Maximum
 
 Response
 
-```
+```json
 {
   "success": true,
   "message": "Customers retrieved successfully.",
@@ -236,8 +236,9 @@ Response
     "per_page": 20,
     "total": 95
   },
-  "errors": null
+  "code": 200
 }
+```
 ```
 
 ---

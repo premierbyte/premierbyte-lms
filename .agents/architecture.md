@@ -58,36 +58,36 @@ The architecture splits the presentation frontend and the API backend into separ
 
 # Core Architectural Layers (Backend)
 
-Backend systems follow a layered structure to isolate business logic from delivery mechanisms.
+Backend systems follow a layered structure using core base abstractions (`App\Core`) to isolate business logic from delivery mechanisms.
 
 ```
 Incoming Request (HTTP / Console / Webhook)
       │
       ▼
-Presentation Layer (Controllers / Command Handlers)
+Presentation Layer (Controllers extending BaseController using ApiResponse)
       │
       ▼
-Input Validation & Transfer (Form Requests / Schemas / DTOs)
+Input Validation & Transfer (Form Requests / Schemas / DTOs extending BaseDTO)
       │
       ▼
-Application Layer (Business Services / Reusable Actions)
+Application Layer (Business Services extending BaseService / Actions extending BaseAction)
       │
       ▼
 Domain Layer (Domain Models / Entities / Business Invariants)
       │
       ▼
-Infrastructure Layer (Data Repositories / Mailers / Cache / Queue / DB)
+Infrastructure Layer (Repositories extending BaseRepository / Mailers / Cache / Queue)
 ```
 
 ---
 
 ## 1. Presentation Layer
-- **Responsibility**: Handle incoming routes, process HTTP requests, parse query parameters, check request-level authorization, and return formatted responses (e.g. JSON API resources).
-- **Rule**: Never place business calculations, database transactions, or external API calls inside Controllers.
+- **Responsibility**: Handle incoming routes, process HTTP requests, parse query parameters, check request-level authorization, and return standardized formatted responses via `ApiResponse` trait (`successResponse`, `errorResponse`, `paginatedResponse`).
+- **Rule**: Controllers must extend `App\Core\BaseController`. Never place business calculations, raw database transactions, or external API calls inside Controllers.
 
 ## 2. Application Layer
-- **Responsibility**: Coordinate workflows, execute business rules, orchestrate multi-step transactions, and dispatch domain events.
-- **Components**: Business Services, Action classes, and Data Transfer Objects (DTOs).
+- **Responsibility**: Coordinate workflows, execute business rules, orchestrate multi-step transactions via `BaseService::transaction()`, log context via `logInfo()`/`logError()`, and dispatch domain events.
+- **Components**: Business Services (extending `BaseService`), Action classes (extending `BaseAction`), and Data Transfer Objects (extending `BaseDTO`).
 
 ## 3. Domain Layer
 - **Responsibility**: Represent the core business entities and rules.
@@ -95,26 +95,32 @@ Infrastructure Layer (Data Repositories / Mailers / Cache / Queue / DB)
 
 ## 4. Infrastructure Layer
 - **Responsibility**: Persist data, manage caches, run queues, and integrate with external APIs/SDKs.
-- **Components**: Database Repositories, Queue Workers, Cache Stores, and Mailers.
+- **Components**: Database Repositories (extending `BaseRepository<TModel>`), Queue Workers, Cache Stores, and Mailers.
 
 ---
 
 # Module Boundaries
 
-Every business domain is organized as an independent module.
+Every business domain is organized as an independent module with auto-discovered routes (`routes/api.php`) via `ModuleServiceProvider`.
 
 ```
-app/Modules/ (or src/modules/)
-├── Users/
-├── Customers/
-├── Products/
-├── Payments/
-├── Subscriptions/
-├── Notifications/
-└── Reports/
+app/
+├── Core/
+│   ├── Contracts/        (ResponseInterface)
+│   ├── Traits/           (ApiResponse)
+│   ├── BaseAction.php
+│   ├── BaseController.php
+│   ├── BaseDTO.php
+│   ├── BaseRepository.php
+│   └── BaseService.php
+└── Modules/
+    ├── Users/            (routes/api.php, Controllers, Services, Repositories, DTOs)
+    ├── Organizations/    (routes/api.php, Controllers, Services, Repositories, DTOs)
+    ├── Licensing/        (routes/api.php, Controllers, Services, Repositories, DTOs)
+    └── Categories/       (routes/api.php, Controllers, Services, Repositories, DTOs)
 ```
 
-Each module contains its own logic layers (Controllers, Services, Repositories, Models, Routes, and Tests) and acts as an isolated subsystem.
+Each module contains its own logic layers (Controllers, Services, Repositories, Models, DTOs, Requests, Resources, `routes/api.php`, and Tests) and acts as an isolated subsystem.
 
 ## Module Communication Rules
 1. **No Direct DB Joins**: A module must never perform SQL queries joining its tables with another module's private tables.

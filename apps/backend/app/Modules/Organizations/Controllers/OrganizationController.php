@@ -2,13 +2,13 @@
 
 namespace App\Modules\Organizations\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Core\BaseController;
 use App\Modules\Organizations\Requests\UpdateOrganizationRequest;
 use App\Modules\Organizations\Resources\OrganizationResource;
 use App\Modules\Organizations\Services\OrganizationService;
 use Illuminate\Http\JsonResponse;
 
-class OrganizationController extends Controller
+class OrganizationController extends BaseController
 {
     public function __construct(
         protected OrganizationService $service
@@ -21,10 +21,7 @@ class OrganizationController extends Controller
     {
         $organization = $this->service->getOrganization();
 
-        return response()->json([
-            'success' => true,
-            'data' => new OrganizationResource($organization),
-        ]);
+        return $this->successResponse(new OrganizationResource($organization), 'Organization details retrieved successfully');
     }
 
     /**
@@ -34,10 +31,6 @@ class OrganizationController extends Controller
     {
         $updated = $this->service->updateOrganization($request->toDTO());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Organization settings updated successfully.',
-            'data' => new OrganizationResource($updated),
-        ]);
+        return $this->successResponse(new OrganizationResource($updated), 'Organization settings updated successfully.');
     }
 }

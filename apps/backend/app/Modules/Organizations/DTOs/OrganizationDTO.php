@@ -2,7 +2,9 @@
 
 namespace App\Modules\Organizations\DTOs;
 
-class OrganizationDTO
+use App\Core\BaseDTO;
+
+class OrganizationDTO extends BaseDTO
 {
     public function __construct(
         public readonly string $name,

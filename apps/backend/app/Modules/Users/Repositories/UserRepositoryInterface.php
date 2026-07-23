@@ -14,7 +14,7 @@ interface UserRepositoryInterface
      *
      * @return LengthAwarePaginator<int, User>
      */
-    public function paginate(int $perPage = 15, ?string $search = null, ?string $role = null): LengthAwarePaginator;
+    public function paginateFiltered(int $perPage = 15, ?string $search = null, ?string $role = null): LengthAwarePaginator;
 
     /**
      * Find user by ID.
@@ -24,15 +24,15 @@ interface UserRepositoryInterface
     /**
      * Create user.
      */
-    public function create(CreateUserDTO $dto): User;
+    public function createUser(CreateUserDTO $dto): User;
 
     /**
      * Update user by ID.
      */
-    public function update(int $id, UpdateUserDTO $dto): User;
+    public function updateUser(int $id, UpdateUserDTO $dto): User;
 
     /**
      * Delete user by ID.
      */
-    public function delete(int $id): bool;
+    public function deleteUser(int $id): bool;
 }

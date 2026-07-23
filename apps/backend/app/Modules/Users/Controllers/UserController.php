@@ -2,7 +2,7 @@
 
 namespace App\Modules\Users\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Core\BaseController;
 use App\Modules\Users\Requests\CreateUserRequest;
 use App\Modules\Users\Requests\UpdateUserRequest;
 use App\Modules\Users\Resources\UserResource;
@@ -10,7 +10,7 @@ use App\Modules\Users\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class UserController extends Controller
+class UserController extends BaseController
 {
     public function __construct(
         protected UserService $service
@@ -29,6 +29,7 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
+            'message' => 'Users retrieved successfully',
             'data' => UserResource::collection($paginator->items()),
             'meta' => [
                 'current_page' => $paginator->currentPage(),
@@ -36,7 +37,8 @@ class UserController extends Controller
                 'per_page' => $paginator->perPage(),
                 'total' => $paginator->total(),
             ],
-        ]);
+            'code' => 200,
+        ], 200);
     }
 
     /**
@@ -46,10 +48,7 @@ class UserController extends Controller
     {
         $user = $this->service->getUser($id);
 
-        return response()->json([
-            'success' => true,
-            'data' => new UserResource($user),
-        ]);
+        return $this->successResponse(new UserResource($user), 'User retrieved successfully');
     }
 
     /**
@@ -59,11 +58,7 @@ class UserController extends Controller
     {
         $user = $this->service->createUser($request->toDTO());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'User created successfully.',
-            'data' => new UserResource($user),
-        ], 201);
+        return $this->successResponse(new UserResource($user), 'User created successfully.', 201);
     }
 
     /**
@@ -73,11 +68,7 @@ class UserController extends Controller
     {
         $user = $this->service->updateUser($id, $request->toDTO());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'User updated successfully.',
-            'data' => new UserResource($user),
-        ]);
+        return $this->successResponse(new UserResource($user), 'User updated successfully.');
     }
 
     /**
@@ -86,15 +77,12 @@ class UserController extends Controller
     public function destroy(Request $request, int $id): JsonResponse
     {
         if (! $request->user()?->can('users.delete')) {
-            return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
+            return $this->errorResponse('Forbidden', 403);
         }
 
         $this->service->deleteUser($id);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'User deleted successfully.',
-        ]);
+        return $this->successResponse(null, 'User deleted successfully.');
     }
 
     /**
@@ -103,7 +91,7 @@ class UserController extends Controller
     public function invite(Request $request): JsonResponse
     {
         if (! $request->user()?->can('users.create')) {
-            return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
+            return $this->errorResponse('Forbidden', 403);
         }
 
         $validated = $request->validate([
@@ -113,10 +101,6 @@ class UserController extends Controller
 
         $user = $this->service->inviteUser($validated);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Invitation sent successfully.',
-            'data' => new UserResource($user),
-        ], 201);
+        return $this->successResponse(new UserResource($user), 'Invitation sent successfully.', 201);
     }
 }

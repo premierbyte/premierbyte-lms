@@ -2,13 +2,14 @@
 
 namespace App\Modules\Categories\Services;
 
+use App\Core\BaseService;
 use App\Modules\Categories\DTOs\CreateCategoryDTO;
 use App\Modules\Categories\DTOs\UpdateCategoryDTO;
 use App\Modules\Categories\Models\Category;
 use App\Modules\Categories\Repositories\CategoryRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 
-class CategoryService
+class CategoryService extends BaseService
 {
     public function __construct(
         protected CategoryRepositoryInterface $repository
@@ -47,7 +48,10 @@ class CategoryService
      */
     public function createCategory(CreateCategoryDTO $dto): Category
     {
-        return $this->repository->create($dto);
+        $category = $this->repository->createCategory($dto);
+        $this->logInfo('Category created', ['id' => $category->id, 'name' => $category->name]);
+
+        return $category;
     }
 
     /**
@@ -65,7 +69,10 @@ class CategoryService
             }
         }
 
-        return $this->repository->update($id, $dto);
+        $category = $this->repository->updateCategory($id, $dto);
+        $this->logInfo('Category updated', ['id' => $category->id]);
+
+        return $category;
     }
 
     /**
@@ -73,7 +80,10 @@ class CategoryService
      */
     public function deleteCategory(int $id): bool
     {
-        return $this->repository->delete($id);
+        $result = $this->repository->deleteCategory($id);
+        $this->logInfo('Category deleted', ['id' => $id]);
+
+        return $result;
     }
 
     /**
@@ -84,6 +94,7 @@ class CategoryService
     public function reorderCategories(array $items): void
     {
         $this->repository->reorder($items);
+        $this->logInfo('Categories reordered', ['count' => count($items)]);
     }
 
     /**

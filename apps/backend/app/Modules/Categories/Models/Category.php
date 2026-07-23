@@ -19,7 +19,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 ])]
 class Category extends Model
 {
-
     /**
      * Parent category relationship.
      *

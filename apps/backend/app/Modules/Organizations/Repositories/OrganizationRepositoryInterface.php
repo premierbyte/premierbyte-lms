@@ -15,5 +15,5 @@ interface OrganizationRepositoryInterface
     /**
      * Update organization by ID.
      */
-    public function update(int $id, OrganizationDTO $dto): Organization;
+    public function updateDTO(int $id, OrganizationDTO $dto): Organization;
 }

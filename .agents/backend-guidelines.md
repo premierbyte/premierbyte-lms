@@ -20,20 +20,19 @@ The backend is structured as a layered Modular Monolith. Business capabilities a
 
 ## 1. Controllers / Request Handlers
 - **Role**: Entry point for HTTP requests.
-- **Responsibilities**: Route incoming requests, authenticate users, check request-level authorization (Policies/Gates), validate parameters, delegate tasks to Services, and return API Resources/DTO responses.
-- **Constraint**: Controllers must be thin. They must not query the database directly, run business logic, or trigger side effects.
+- **Responsibilities**: Route incoming requests, authenticate users, check request-level authorization (Policies/Gates), validate parameters, delegate tasks to Services, and return standardized JSON responses using `ApiResponse` methods (`successResponse`, `paginatedResponse`, `errorResponse`).
+- **Constraint**: All controllers MUST extend `App\Core\BaseController`. They must remain thin and must not query the database directly, run business logic, or trigger side effects.
 
 ### Laravel Reference:
 ```php
-public function store(StoreCustomerRequest $request)
+class CustomerController extends BaseController
 {
-    $this->authorize('create', Customer::class);
+    public function store(StoreCustomerRequest $request): JsonResponse
+    {
+        $customer = $this->customerService->create($request->toDTO());
 
-    $customer = $this->customerService->create(
-        CreateCustomerDTO::fromRequest($request)
-    );
-
-    return CustomerResource::make($customer);
+        return $this->successResponse(new CustomerResource($customer), 'Customer created successfully', 201);
+    }
 }
 ```
 
@@ -41,14 +40,14 @@ public function store(StoreCustomerRequest $request)
 
 ## 2. Services
 - **Role**: Business logic orchestration.
-- **Responsibilities**: Execute multi-stage operations, run calculations, manage transaction boundaries, and coordinate actions/repositories.
+- **Responsibilities**: All service classes MUST extend `App\Core\BaseService`. Execute multi-stage operations, run calculations, wrap multi-step DB writes using `$this->transaction(fn () => ...)`, log domain context using `$this->logInfo()` / `$this->logError()`, and coordinate repositories.
 - **Constraint**: Services must remain independent of delivery channels (HTTP, CLI, Webhooks). They should throw typed business exceptions and must never return HTTP responses directly.
 
 ---
 
 ## 3. Repositories
 - **Role**: Data access abstraction.
-- **Responsibilities**: Interface with database models, write queries, encapsulate search filters, and handle sorting/pagination.
+- **Responsibilities**: Concrete repository implementations MUST extend `App\Core\BaseRepository<TModel>` and define `$modelClass`. Interface contracts extend `BaseRepositoryInterface`. Repositories interface with database models, write queries, encapsulate search filters, and handle sorting/pagination.
 - **Constraint**: Models must not be queried directly in Controllers or Services. Services should access database layers strictly via Repositories to isolate database structure details from business logic.
 
 ---

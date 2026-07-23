@@ -31,17 +31,17 @@ interface CategoryRepositoryInterface
     /**
      * Create category.
      */
-    public function create(CreateCategoryDTO $dto): Category;
+    public function createCategory(CreateCategoryDTO $dto): Category;
 
     /**
      * Update category.
      */
-    public function update(int $id, UpdateCategoryDTO $dto): Category;
+    public function updateCategory(int $id, UpdateCategoryDTO $dto): Category;
 
     /**
      * Delete category.
      */
-    public function delete(int $id): bool;
+    public function deleteCategory(int $id): bool;
 
     /**
      * Batch update category sort order.

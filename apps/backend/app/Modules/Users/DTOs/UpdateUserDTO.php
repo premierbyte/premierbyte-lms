@@ -2,7 +2,9 @@
 
 namespace App\Modules\Users\DTOs;
 
-class UpdateUserDTO
+use App\Core\BaseDTO;
+
+class UpdateUserDTO extends BaseDTO
 {
     /**
      * @param  array<int, string>  $roles
@@ -37,5 +39,24 @@ class UpdateUserDTO
             status: (string) ($data['status'] ?? 'active'),
             roles: isset($data['roles']) && is_array($data['roles']) ? array_values(array_map('strval', $data['roles'])) : []
         );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toArray(): array
+    {
+        return [
+            'first_name' => $this->firstName,
+            'last_name' => $this->lastName,
+            'username' => $this->username,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'password' => $this->password,
+            'avatar' => $this->avatar,
+            'bio' => $this->bio,
+            'status' => $this->status,
+            'roles' => $this->roles,
+        ];
     }
 }

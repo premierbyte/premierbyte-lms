@@ -51,17 +51,27 @@ Contains all deployable services and user interfaces. Each application within th
   ```
   apps/backend/
   ├── app/
-  │   ├── Core/       # Reusable base logic (BaseController, BaseService, exceptions)
+  │   ├── Core/       # Reusable base abstractions
+  │   │   ├── Contracts/        (ResponseInterface)
+  │   │   ├── Traits/           (ApiResponse)
+  │   │   ├── BaseAction.php    (Single-purpose transaction base)
+  │   │   ├── BaseController.php(Base HTTP controller with ApiResponse)
+  │   │   ├── BaseDTO.php       (JsonSerializable Base DTO)
+  │   │   ├── BaseRepository.php(Generic Eloquent CRUD Repository)
+  │   │   └── BaseService.php   (Base service with DB transactions & logging)
+  │   ├── Providers/  # Service providers (ModuleServiceProvider for auto-discovery)
   │   └── Modules/    # Business domain modules
-  │       └── Customers/
-  │           ├── Controllers/   # HTTP handlers (routing, input parsing, resource return)
+  │       └── Users/
+  │           ├── Actions/       # Single-purpose business transaction actions
+  │           ├── Controllers/   # HTTP handlers (extends BaseController)
   │           ├── Models/        # Relational models and properties
-  │           ├── Services/      # Business logical workflows
-  │           ├── Repositories/  # DB queries and aggregates
-  │           ├── DTOs/          # Data transfer validation mapping
-  │           ├── Requests/      # Input validations
-  │           ├── Resources/     # Output transformation structures
+  │           ├── Services/      # Business logical workflows (extends BaseService)
+  │           ├── Repositories/  # DB queries (extends BaseRepository)
+  │           ├── DTOs/          # Data transfer objects (extends BaseDTO)
+  │           ├── Requests/      # Input validation form requests
+  │           ├── Resources/     # Output transformer resources
   │           ├── Policies/      # Access rules
+  │           ├── routes/        # Module routes (api.php auto-discovered)
   │           └── Tests/         # Module test suites
   ```
 

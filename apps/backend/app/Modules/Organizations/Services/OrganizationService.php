@@ -2,12 +2,13 @@
 
 namespace App\Modules\Organizations\Services;
 
+use App\Core\BaseService;
 use App\Modules\Organizations\DTOs\OrganizationDTO;
 use App\Modules\Organizations\Models\Organization;
 use App\Modules\Organizations\Repositories\OrganizationRepositoryInterface;
 use Illuminate\Support\Facades\Cache;
 
-class OrganizationService
+class OrganizationService extends BaseService
 {
     public function __construct(
         protected OrganizationRepositoryInterface $repository
@@ -29,9 +30,10 @@ class OrganizationService
     public function updateOrganization(OrganizationDTO $dto): Organization
     {
         $current = $this->getOrganization();
-        $updated = $this->repository->update($current->id, $dto);
+        $updated = $this->repository->updateDTO($current->id, $dto);
 
         Cache::forget('primary_organization_details');
+        $this->logInfo('Organization details updated', ['id' => $updated->id]);
 
         return $updated;
     }

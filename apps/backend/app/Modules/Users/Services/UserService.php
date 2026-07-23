@@ -2,13 +2,14 @@
 
 namespace App\Modules\Users\Services;
 
+use App\Core\BaseService;
 use App\Models\User;
 use App\Modules\Users\DTOs\CreateUserDTO;
 use App\Modules\Users\DTOs\UpdateUserDTO;
 use App\Modules\Users\Repositories\UserRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
-class UserService
+class UserService extends BaseService
 {
     public function __construct(
         protected UserRepositoryInterface $repository
@@ -21,7 +22,7 @@ class UserService
      */
     public function getUsers(int $perPage = 15, ?string $search = null, ?string $role = null): LengthAwarePaginator
     {
-        return $this->repository->paginate($perPage, $search, $role);
+        return $this->repository->paginateFiltered($perPage, $search, $role);
     }
 
     /**
@@ -37,7 +38,10 @@ class UserService
      */
     public function createUser(CreateUserDTO $dto): User
     {
-        return $this->repository->create($dto);
+        $user = $this->repository->createUser($dto);
+        $this->logInfo('User created', ['id' => $user->id, 'email' => $user->email]);
+
+        return $user;
     }
 
     /**
@@ -45,7 +49,10 @@ class UserService
      */
     public function updateUser(int $id, UpdateUserDTO $dto): User
     {
-        return $this->repository->update($id, $dto);
+        $user = $this->repository->updateUser($id, $dto);
+        $this->logInfo('User updated', ['id' => $user->id]);
+
+        return $user;
     }
 
     /**
@@ -53,7 +60,10 @@ class UserService
      */
     public function deleteUser(int $id): bool
     {
-        return $this->repository->delete($id);
+        $result = $this->repository->deleteUser($id);
+        $this->logInfo('User deleted', ['id' => $id]);
+
+        return $result;
     }
 
     /**
@@ -68,7 +78,7 @@ class UserService
             lastName: (string) ($data['last_name'] ?? 'User'),
             username: (string) ($data['username'] ?? 'user_'.time()),
             email: (string) ($data['email'] ?? ''),
-            password: 'Password123!!', // Temporary password
+            password: 'Password123!!',
             phone: null,
             avatar: null,
             bio: null,

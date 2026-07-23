@@ -2,14 +2,20 @@
 
 namespace App\Modules\Categories\Repositories;
 
+use App\Core\BaseRepository;
 use App\Modules\Categories\DTOs\CreateCategoryDTO;
 use App\Modules\Categories\DTOs\UpdateCategoryDTO;
 use App\Modules\Categories\Models\Category;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
-class CategoryRepository implements CategoryRepositoryInterface
+/**
+ * @extends BaseRepository<Category>
+ */
+class CategoryRepository extends BaseRepository implements CategoryRepositoryInterface
 {
+    protected string $modelClass = Category::class;
+
     /**
      * Get root category tree with nested children.
      *
@@ -17,13 +23,16 @@ class CategoryRepository implements CategoryRepositoryInterface
      */
     public function getTree(): Collection
     {
-        return Category::query()
+        /** @var Collection<int, Category> $result */
+        $result = Category::query()
             ->roots()
             ->with(['children' => function ($query) {
                 $query->with('children');
             }])
             ->orderBy('sort_order', 'asc')
             ->get();
+
+        return $result;
     }
 
     /**
@@ -40,7 +49,10 @@ class CategoryRepository implements CategoryRepositoryInterface
                 ->orWhere('description', 'like', "%{$search}%");
         }
 
-        return $query->orderBy('sort_order', 'asc')->get();
+        /** @var Collection<int, Category> $result */
+        $result = $query->orderBy('sort_order', 'asc')->get();
+
+        return $result;
     }
 
     /**
@@ -48,24 +60,30 @@ class CategoryRepository implements CategoryRepositoryInterface
      */
     public function findById(int $id): Category
     {
-        return Category::with(['parent', 'children'])->findOrFail($id);
+        /** @var Category $category */
+        $category = Category::with(['parent', 'children'])->findOrFail($id);
+
+        return $category;
     }
 
     /**
      * Create category.
      */
-    public function create(CreateCategoryDTO $dto): Category
+    public function createCategory(CreateCategoryDTO $dto): Category
     {
-        return Category::create($dto->toArray());
+        /** @var Category $category */
+        $category = $this->create($dto->toArray());
+
+        return $category;
     }
 
     /**
      * Update category.
      */
-    public function update(int $id, UpdateCategoryDTO $dto): Category
+    public function updateCategory(int $id, UpdateCategoryDTO $dto): Category
     {
-        $category = $this->findById($id);
-        $category->update($dto->toArray());
+        /** @var Category $category */
+        $category = $this->update($id, $dto->toArray());
 
         return $category;
     }
@@ -73,11 +91,9 @@ class CategoryRepository implements CategoryRepositoryInterface
     /**
      * Delete category.
      */
-    public function delete(int $id): bool
+    public function deleteCategory(int $id): bool
     {
-        $category = $this->findById($id);
-
-        return (bool) $category->delete();
+        return $this->delete($id);
     }
 
     /**

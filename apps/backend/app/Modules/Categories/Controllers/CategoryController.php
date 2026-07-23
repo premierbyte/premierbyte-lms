@@ -2,7 +2,7 @@
 
 namespace App\Modules\Categories\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Core\BaseController;
 use App\Modules\Categories\Requests\CreateCategoryRequest;
 use App\Modules\Categories\Requests\UpdateCategoryRequest;
 use App\Modules\Categories\Resources\CategoryResource;
@@ -10,7 +10,7 @@ use App\Modules\Categories\Services\CategoryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class CategoryController extends Controller
+class CategoryController extends BaseController
 {
     public function __construct(
         protected CategoryService $service
@@ -30,10 +30,7 @@ class CategoryController extends Controller
             $categories = $this->service->getAllCategories($search);
         }
 
-        return response()->json([
-            'success' => true,
-            'data' => CategoryResource::collection($categories),
-        ]);
+        return $this->successResponse(CategoryResource::collection($categories), 'Categories retrieved successfully');
     }
 
     /**
@@ -43,10 +40,7 @@ class CategoryController extends Controller
     {
         $category = $this->service->getCategory($id);
 
-        return response()->json([
-            'success' => true,
-            'data' => new CategoryResource($category),
-        ]);
+        return $this->successResponse(new CategoryResource($category), 'Category details retrieved successfully');
     }
 
     /**
@@ -56,11 +50,7 @@ class CategoryController extends Controller
     {
         $category = $this->service->createCategory($request->toDTO());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Category created successfully.',
-            'data' => new CategoryResource($category),
-        ], 201);
+        return $this->successResponse(new CategoryResource($category), 'Category created successfully.', 201);
     }
 
     /**
@@ -71,16 +61,9 @@ class CategoryController extends Controller
         try {
             $category = $this->service->updateCategory($id, $request->toDTO());
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Category updated successfully.',
-                'data' => new CategoryResource($category),
-            ]);
+            return $this->successResponse(new CategoryResource($category), 'Category updated successfully.');
         } catch (\InvalidArgumentException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 422);
+            return $this->errorResponse($e->getMessage(), 422);
         }
     }
 
@@ -90,15 +73,12 @@ class CategoryController extends Controller
     public function destroy(Request $request, int $id): JsonResponse
     {
         if (! $request->user()?->can('categories.delete')) {
-            return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
+            return $this->errorResponse('Forbidden', 403);
         }
 
         $this->service->deleteCategory($id);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Category deleted successfully.',
-        ]);
+        return $this->successResponse(null, 'Category deleted successfully.');
     }
 
     /**
@@ -107,7 +87,7 @@ class CategoryController extends Controller
     public function reorder(Request $request): JsonResponse
     {
         if (! $request->user()?->can('categories.update')) {
-            return response()->json(['success' => false, 'message' => 'Forbidden'], 403);
+            return $this->errorResponse('Forbidden', 403);
         }
 
         $validated = $request->validate([
@@ -121,9 +101,6 @@ class CategoryController extends Controller
 
         $this->service->reorderCategories($items);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Category order updated successfully.',
-        ]);
+        return $this->successResponse(null, 'Category order updated successfully.');
     }
 }

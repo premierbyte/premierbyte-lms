@@ -2,7 +2,9 @@
 
 namespace App\Modules\Categories\DTOs;
 
-class CreateCategoryDTO
+use App\Core\BaseDTO;
+
+class CreateCategoryDTO extends BaseDTO
 {
     public function __construct(
         public readonly string $name,
