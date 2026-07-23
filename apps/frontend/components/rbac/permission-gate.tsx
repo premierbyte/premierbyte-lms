@@ -9,11 +9,16 @@ export function hasRole(user: User | null, roleName: string): boolean {
 
   return user.roles.some((r: any) => {
     const name = typeof r === 'string' ? r : r?.name;
-    return typeof name === 'string' && name.toLowerCase() === roleName.toLowerCase();
+    return (
+      typeof name === 'string' && name.toLowerCase() === roleName.toLowerCase()
+    );
   });
 }
 
-export function hasPermission(user: User | null, permissionName: string): boolean {
+export function hasPermission(
+  user: User | null,
+  permissionName: string
+): boolean {
   if (!user) return false;
 
   // Super Admin & Admin bypass specific permission requirements
@@ -25,7 +30,10 @@ export function hasPermission(user: User | null, permissionName: string): boolea
 
   return user.permissions.some((p: any) => {
     const name = typeof p === 'string' ? p : p?.name;
-    return typeof name === 'string' && name.toLowerCase() === permissionName.toLowerCase();
+    return (
+      typeof name === 'string' &&
+      name.toLowerCase() === permissionName.toLowerCase()
+    );
   });
 }
 
@@ -35,7 +43,11 @@ interface PermissionGateProps {
   children: React.ReactNode;
 }
 
-export function PermissionGate({ permission, fallback = null, children }: PermissionGateProps) {
+export function PermissionGate({
+  permission,
+  fallback = null,
+  children,
+}: PermissionGateProps) {
   const { user } = useAuthStore();
 
   if (!hasPermission(user, permission)) {
