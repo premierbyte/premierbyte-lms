@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useCategories } from '../hooks/use-categories';
 import { Category } from '../types';
 import CategoryModal from './category-modal';
+import { PermissionGate } from '@/components/rbac/permission-gate';
 import { toast } from 'sonner';
 
 export default function CategoryList() {
@@ -102,72 +103,72 @@ export default function CategoryList() {
               </div>
             </div>
           </td>
-
-          <td className="px-6 py-4 font-mono text-xs text-slate-400">
+          <td className="px-6 py-4 font-mono text-xs text-indigo-400">
             /{category.slug}
           </td>
-
           <td className="px-6 py-4">
             <div className="flex items-center space-x-1.5">
-              <span className="rounded-md border border-slate-800 bg-slate-950 px-2 py-0.5 font-mono text-xs font-bold text-slate-300">
-                {category.sort_order}
+              <span className="rounded bg-slate-800 px-2 py-0.5 font-mono text-xs text-slate-300">
+                #{category.sort_order}
               </span>
-              <div className="flex flex-col">
+              <PermissionGate permission="categories.update">
                 <button
                   onClick={() => handleAdjustSort(category, -1)}
-                  className="px-1 text-[9px] leading-none text-slate-400 hover:text-indigo-400"
+                  className="rounded px-1.5 py-0.5 text-xs text-slate-400 hover:bg-slate-800 hover:text-white"
                   title="Move Up"
                 >
                   ▲
                 </button>
                 <button
                   onClick={() => handleAdjustSort(category, 1)}
-                  className="px-1 text-[9px] leading-none text-slate-400 hover:text-indigo-400"
+                  className="rounded px-1.5 py-0.5 text-xs text-slate-400 hover:bg-slate-800 hover:text-white"
                   title="Move Down"
                 >
                   ▼
                 </button>
-              </div>
+              </PermissionGate>
             </div>
           </td>
-
           <td className="px-6 py-4">
             <span
               className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
                 category.status === 'active'
                   ? 'border border-emerald-500/20 bg-emerald-500/10 text-emerald-400'
-                  : 'border border-slate-700 bg-slate-800 text-slate-400'
+                  : 'border border-rose-500/20 bg-rose-500/10 text-rose-400'
               }`}
             >
               {category.status}
             </span>
           </td>
-
-          <td className="space-x-2 px-6 py-4 text-right">
-            <button
-              onClick={() => handleOpenCreateSub(category.id)}
-              className="rounded-lg bg-purple-500/10 px-2.5 py-1 text-xs font-semibold text-purple-400 transition-all hover:bg-purple-500/20 hover:text-purple-300"
-            >
-              + Subcategory
-            </button>
-            <button
-              onClick={() => handleOpenEdit(category)}
-              className="rounded-lg bg-indigo-500/10 px-2.5 py-1 text-xs font-semibold text-indigo-400 transition-all hover:bg-indigo-500/20 hover:text-indigo-300"
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => handleDelete(category)}
-              className="rounded-lg bg-rose-500/10 px-2.5 py-1 text-xs font-semibold text-rose-400 transition-all hover:bg-rose-500/20 hover:text-rose-300"
-            >
-              Delete
-            </button>
+          <td className="px-6 py-4 text-right">
+            <div className="flex items-center justify-end space-x-2">
+              <PermissionGate permission="categories.create">
+                <button
+                  onClick={() => handleOpenCreateSub(category.id)}
+                  className="rounded-lg border border-purple-500/20 bg-purple-500/10 px-2.5 py-1 text-xs font-medium text-purple-300 transition-colors hover:bg-purple-500/20"
+                >
+                  + Sub
+                </button>
+              </PermissionGate>
+              <button
+                onClick={() => handleOpenEdit(category)}
+                className="rounded-lg border border-slate-800 bg-slate-950 px-2.5 py-1 text-xs font-medium text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
+              >
+                Edit
+              </button>
+              <PermissionGate permission="categories.delete">
+                <button
+                  onClick={() => handleDelete(category)}
+                  className="rounded-lg border border-rose-500/20 bg-rose-500/10 px-2.5 py-1 text-xs font-medium text-rose-400 transition-colors hover:bg-rose-500/20"
+                >
+                  Delete
+                </button>
+              </PermissionGate>
+            </div>
           </td>
         </tr>
-
-        {/* Render Children Recursively if Expanded or in Search Mode */}
-        {(isExpanded || search) &&
-          hasChildren &&
+        {hasChildren &&
+          isExpanded &&
           category.children!.map((child) =>
             renderCategoryRow(child, depth + 1)
           )}
@@ -181,20 +182,22 @@ export default function CategoryList() {
       <div className="flex flex-col justify-between gap-4 rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-xl backdrop-blur-xl md:flex-row md:items-center">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-100">
-            Category Management
+            Category Taxonomy
           </h1>
           <p className="mt-1 text-sm text-slate-400">
-            Organize courses into nested hierarchies, topics, and custom display
-            ranks.
+            Manage course category hierarchies, nested parent-child trees, and
+            sort ordering.
           </p>
         </div>
 
-        <button
-          onClick={handleOpenCreateRoot}
-          className="flex transform items-center space-x-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-indigo-600/25 transition-all hover:from-indigo-500 hover:to-purple-500 active:scale-95"
-        >
-          <span>+ Add Root Category</span>
-        </button>
+        <PermissionGate permission="categories.create">
+          <button
+            onClick={handleOpenCreateRoot}
+            className="flex transform items-center space-x-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-purple-600/25 transition-all hover:from-purple-500 hover:to-indigo-500 active:scale-95"
+          >
+            <span>+ Add Root Category</span>
+          </button>
+        </PermissionGate>
       </div>
 
       {/* Filter and Search Bar */}
@@ -205,13 +208,13 @@ export default function CategoryList() {
             placeholder="Search categories..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-xl border border-slate-800 bg-slate-950/60 py-2 pr-4 pl-9 text-xs text-slate-200 placeholder-slate-500 transition-all outline-none focus:border-indigo-500"
+            className="w-full rounded-xl border border-slate-800 bg-slate-950 px-4 py-2 pl-9 text-xs text-slate-200 placeholder-slate-500 transition-all outline-none focus:border-purple-500"
           />
           <svg
             className="absolute top-2.5 left-3 h-4 w-4 text-slate-500"
             fill="none"
-            stroke="currentColor"
             viewBox="0 0 24 24"
+            stroke="currentColor"
           >
             <path
               strokeLinecap="round"
@@ -224,41 +227,39 @@ export default function CategoryList() {
       </div>
 
       {/* Categories Tree Table */}
-      <div className="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/90 shadow-2xl">
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left">
-            <thead>
-              <tr className="border-b border-slate-800/80 bg-slate-950/60 text-[11px] tracking-wider text-slate-400 uppercase">
-                <th className="px-6 py-4 font-semibold">Category Hierarchy</th>
-                <th className="px-6 py-4 font-semibold">Slug</th>
-                <th className="px-6 py-4 font-semibold">Sort Order</th>
-                <th className="px-6 py-4 font-semibold">Status</th>
-                <th className="px-6 py-4 text-right font-semibold">Actions</th>
+      <div className="overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 shadow-2xl">
+        <table className="w-full text-left text-sm text-slate-400">
+          <thead className="border-b border-slate-800 bg-slate-950/60 text-xs font-semibold tracking-wider text-slate-400 uppercase">
+            <tr>
+              <th className="px-6 py-4">Category Hierarchy</th>
+              <th className="px-6 py-4">URL Slug</th>
+              <th className="px-6 py-4">Sort Order</th>
+              <th className="px-6 py-4">Status</th>
+              <th className="px-6 py-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-800/60">
+            {isLoading ? (
+              <tr>
+                <td colSpan={5} className="p-8 text-center text-slate-500">
+                  Loading taxonomy tree...
+                </td>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-800/60 text-sm">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={5} className="py-12 text-center text-slate-500">
-                    <div className="mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-3 border-indigo-500/20 border-t-indigo-500" />
-                    Loading category hierarchy...
-                  </td>
-                </tr>
-              ) : categories.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="py-12 text-center text-slate-500">
-                    No categories found.
-                  </td>
-                </tr>
-              ) : (
-                categories.map((category) => renderCategoryRow(category, 0))
-              )}
-            </tbody>
-          </table>
-        </div>
+            ) : categories.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="p-8 text-center text-slate-500">
+                  No categories found. Create a root category to build your
+                  taxonomy.
+                </td>
+              </tr>
+            ) : (
+              categories.map((c) => renderCategoryRow(c, 0))
+            )}
+          </tbody>
+        </table>
       </div>
 
-      {/* Category Create/Edit Modal */}
+      {/* Category Form Modal */}
       <CategoryModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
