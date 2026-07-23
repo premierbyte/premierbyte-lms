@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1df97482587d54a84e8e0c5a1347d25f",
+    "content-hash": "b54d000cb6cc08b4fa8379d78b9557bc",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -3308,6 +3308,51 @@
                 "source": "https://github.com/antonioribeiro/google2fa/tree/v9.0.0"
             },
             "time": "2025-09-19T22:51:08+00:00"
+        },
+        {
+            "name": "premierbyte/licensing-sdk-php",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/premierbyte/premierbyte-licensing-sdk-php.git",
+                "reference": "3416dbca457a229cafc12119a75015ae86bbf8e8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/premierbyte/premierbyte-licensing-sdk-php/zipball/3416dbca457a229cafc12119a75015ae86bbf8e8",
+                "reference": "3416dbca457a229cafc12119a75015ae86bbf8e8",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Premierbyte\\LicensingSdk\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Premierbyte Platform Team",
+                    "email": "engineering@premierbyte.ng"
+                }
+            ],
+            "description": "Official PHP Licensing & Feature Management SDK for Premierbyte software products",
+            "support": {
+                "issues": "https://github.com/premierbyte/premierbyte-licensing-sdk-php/issues",
+                "source": "https://github.com/premierbyte/premierbyte-licensing-sdk-php/tree/v1.0.0"
+            },
+            "time": "2026-07-23T01:09:11+00:00"
         },
         {
             "name": "psr/clock",

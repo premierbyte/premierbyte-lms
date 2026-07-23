@@ -48,7 +48,7 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Get the user's full name.
      *
-     * @return \Illuminate\Database\Eloquent\Casts\Attribute<string, never>
+     * @return Attribute<string, never>
      */
     protected function name(): Attribute
     {

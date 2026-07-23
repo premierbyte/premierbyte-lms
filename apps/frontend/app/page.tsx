@@ -3,6 +3,8 @@
 import React from 'react';
 import RouteGuard from '@/components/route-guard';
 import { useAuth } from '@/features/auth/hooks/use-auth';
+import { RestrictedBanner } from '@/features/licensing/components/restricted-banner';
+import { FeatureGate } from '@/features/licensing/components/feature-gate';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 
@@ -22,6 +24,7 @@ export default function Home() {
 
   return (
     <RouteGuard>
+      <RestrictedBanner />
       <div className="relative flex min-h-screen flex-col overflow-hidden bg-slate-950 font-sans text-slate-100">
         {/* Decorative background glow */}
         <div className="pointer-events-none absolute top-0 right-1/4 h-[500px] w-[500px] rounded-full bg-indigo-500/5 blur-3xl" />
@@ -153,6 +156,101 @@ export default function Home() {
                     </span>
                   )}
                 </div>
+              </div>
+            </div>
+
+            {/* Premium Feature Flags Card */}
+            <div className="rounded-3xl border border-slate-800/80 bg-slate-900 p-6 shadow-xl lg:col-span-3">
+              <h3 className="mb-4 text-lg font-bold text-slate-200">
+                Licensing & Feature Flags Evaluation
+              </h3>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <FeatureGate
+                  feature="advanced_reports"
+                  fallback={
+                    <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-4 opacity-50">
+                      <span className="text-xs font-semibold text-slate-500 uppercase">
+                        Disabled Feature
+                      </span>
+                      <h4 className="mt-1 font-bold text-slate-400">
+                        Advanced Reports
+                      </h4>
+                      <p className="mt-1 text-xs text-slate-500">
+                        Upgrade license to unlock deep analytics.
+                      </p>
+                    </div>
+                  }
+                >
+                  <div className="rounded-2xl border border-indigo-500/30 bg-indigo-500/10 p-4">
+                    <span className="text-xs font-semibold text-indigo-400 uppercase">
+                      Active Feature
+                    </span>
+                    <h4 className="mt-1 font-bold text-slate-100">
+                      Advanced Reports
+                    </h4>
+                    <p className="mt-1 text-xs text-indigo-300/80">
+                      Full enterprise analytics reporting active.
+                    </p>
+                  </div>
+                </FeatureGate>
+
+                <FeatureGate
+                  feature="ai_features"
+                  fallback={
+                    <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-4 opacity-50">
+                      <span className="text-xs font-semibold text-slate-500 uppercase">
+                        Disabled Feature
+                      </span>
+                      <h4 className="mt-1 font-bold text-slate-400">
+                        AI Generator
+                      </h4>
+                      <p className="mt-1 text-xs text-slate-500">
+                        AI automated content creation disabled.
+                      </p>
+                    </div>
+                  }
+                >
+                  <div className="rounded-2xl border border-purple-500/30 bg-purple-500/10 p-4">
+                    <span className="text-xs font-semibold text-purple-400 uppercase">
+                      Active Feature
+                    </span>
+                    <h4 className="mt-1 font-bold text-slate-100">
+                      AI Generator
+                    </h4>
+                    <p className="mt-1 text-xs text-purple-300/80">
+                      Automated AI content tools enabled.
+                    </p>
+                  </div>
+                </FeatureGate>
+
+                <FeatureGate
+                  feature="certificates"
+                  fallback={
+                    <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-4 opacity-50">
+                      <span className="text-xs font-semibold text-slate-500 uppercase">
+                        Disabled Feature
+                      </span>
+                      <h4 className="mt-1 font-bold text-slate-400">
+                        Certificates Engine
+                      </h4>
+                      <p className="mt-1 text-xs text-slate-500">
+                        Custom certificate creation disabled.
+                      </p>
+                    </div>
+                  }
+                >
+                  <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4">
+                    <span className="text-xs font-semibold text-emerald-400 uppercase">
+                      Active Feature
+                    </span>
+                    <h4 className="mt-1 font-bold text-slate-100">
+                      Certificates Engine
+                    </h4>
+                    <p className="mt-1 text-xs text-emerald-300/80">
+                      Verifiable PDF certificate generation active.
+                    </p>
+                  </div>
+                </FeatureGate>
               </div>
             </div>
           </div>
